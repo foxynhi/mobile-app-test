@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<IsPackable>false</IsPackable>
+		<IsTestProject>true</IsTestProject>
+    <RootNamespace>MobileAppTest</RootNamespace>
+    <AssemblyName>MobileAppTest</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+		<PackageReference Include="ExtentReports" Version="5.0.4" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+		<PackageReference Include="coverlet.collector" Version="6.0.0" />
+		<PackageReference Include="NUnit" Version="4.3.2" />
+		<PackageReference Include="NUnit3TestAdapter" Version="5.0.0" />
+		<PackageReference Include="Selenium.WebDriver" Version="4.17.0" />
+		<PackageReference Include="Selenium.Support" Version="4.17.0" />
+		<PackageReference Include="Appium.WebDriver" Version="5.0.0-beta01" />
+		<PackageReference Include="DotNetSeleniumExtras.WaitHelpers" Version="3.11.0" />
+		<PackageReference Include="System.CodeDom" Version="9.0.7" />
+		<PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.7" />
+  </ItemGroup>
+</Project>
