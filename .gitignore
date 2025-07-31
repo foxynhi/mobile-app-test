@@ -10,6 +10,6 @@ out/
 *.tlog
 *.tmp
 
-TestResults/
+TestResults/Screenshots
 
 packages/

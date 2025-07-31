@@ -48,5 +48,9 @@ namespace MobileAppTest.Utilities
     {
       ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].scrollIntoView(true);", driver.FindElement(locator));
     }
+    public static void ClickJS(By locator)
+    {
+      ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].click();", driver.FindElement(locator));
+    }
   }
 }

@@ -78,7 +78,7 @@ namespace MobileAppTest.Page
       WaitUtility.TryClick(dateSubmit);
       WaitUtility.TryClick(searchBtn);
 
-      Thread.Sleep(6000);
+      Thread.Sleep(5000);
 
       var contexts = driver.Contexts; 
       var webviewContext = contexts.FirstOrDefault(c => c.Contains("WEBVIEW"));
@@ -101,43 +101,43 @@ namespace MobileAppTest.Page
         WaitUtility.TryClick(title, 10);
         WaitUtility.TryClick(By.XPath("//mat-option//span[text()='Mr']"));
 
+        ReportUtility.LogInfo("Entering first name");
         var firstName = By.CssSelector("input[formcontrolname='firstName'][aria-required=\"true\"]");
-        ActionUtility.SwipeToElementJS(firstName);
         WaitUtility.TryClick(firstName);
         SendKeys(firstName, "John");
 
+        ReportUtility.LogInfo("Entering last name");
         var lastName = By.CssSelector("input[formcontrolname='lastName'][aria-required=\"true\"]");
-        ActionUtility.SwipeToElementJS(lastName);
         WaitUtility.TryClick(lastName);
         SendKeys(lastName, "Adam");
 
+        ReportUtility.LogInfo("Entering DOB");
         var DOB = By.CssSelector("input[formcontrolname='dob'][aria-required=\"true\"]");
-        ActionUtility.SwipeToElementJS(DOB);
         WaitUtility.TryClick(DOB);
         SendKeys(DOB, "01012000");
 
+        ReportUtility.LogInfo("Choosing sex");
         var maleBtn = By.CssSelector("input[type='radio'][value='male']");
         ActionUtility.SwipeToElementJS(maleBtn);
-        WaitUtility.TryClick(maleBtn);
+        ActionUtility.ClickJS(maleBtn);
 
-        var nationality = By.CssSelector("input[placeholder='Nationality']");
-        ActionUtility.SwipeToElementJS(nationality);
+        ReportUtility.LogInfo("Choosing nationality");
+        var nationality = By.XPath("//input[@placeholder='Nationality']");
         WaitUtility.TryClick(nationality);
         SendKeys(nationality, "Viet");
-        WaitUtility.TryClick(By.XPath("//mat-option//span[text()='Vietnamese']"), 5);
+        WaitUtility.TryClick(By.XPath("//mat-option//span[contains(text(), 'Viet')]"), 5);
 
+        ReportUtility.LogInfo("Entering document number");
         var docNumber = By.XPath("input[placeholder='Your document number']");
-        ActionUtility.SwipeToElementJS(docNumber);
         WaitUtility.TryClick(docNumber);
         SendKeys(docNumber, "C3481043");
 
+        ReportUtility.LogInfo("Entering document expiry date");
         var expDate = By.XPath("input[placeholder='Select the expiry date']");
-        ActionUtility.SwipeToElement(expDate);
         WaitUtility.TryClick(expDate);
         SendKeys(expDate, "01012027");
 
-        var docCountry = By.XPath("input[placeholder='Document issued by']");
-        ActionUtility.SwipeToElementJS(docCountry);
+        var docCountry = By.CssSelector("input[placeholder='Document issued by']");
         WaitUtility.TryClick(docCountry);
         SendKeys(docCountry, "Viet");
         WaitUtility.TryClick(By.XPath("//mat-option//span[contains(text(),'Viet')]"), 5);
@@ -148,24 +148,24 @@ namespace MobileAppTest.Page
         SendKeys(emailInp, "dinh71234@gmail.com");
 
         var confirmEmailInp = By.XPath("//label[contains(., 'Confirm email')]/ancestor::div[contains(@class,'mat-mdc-form-field-flex')]//input[@type='email']");
-        ActionUtility.SwipeToElementJS(confirmEmailInp);
         WaitUtility.TryClick(confirmEmailInp);
         SendKeys(confirmEmailInp, "dinkhoi71234@gmail.com");
 
-        var code = By.XPath("input[placeholder='Your country calling code']");
-        ActionUtility.SwipeToElementJS(code);
+        var code = By.CssSelector("input[placeholder='Your country calling code']");
         WaitUtility.TryClick(code);
         SendKeys(code, "Viet");
         WaitUtility.TryClick(By.XPath("//mat-option//span[contains(text(),'Viet')]"), 5);
 
-        var phoneNumber = By.XPath("input[placeholder='Your mobile phone']");
-        ActionUtility.SwipeToElementJS(phoneNumber);
+        var phoneNumber = By.CssSelector("input[placeholder='Your mobile phone']");
         WaitUtility.TryClick(phoneNumber);
         SendKeys(phoneNumber, "0982136343");
+
+        var submitBtn = By.XPath("//button//span[text()='Select Services']");
+        WaitUtility.TryClick(submitBtn);
       }
       else
       {
-        Console.WriteLine("No WebView context found");
+        ReportUtility.LogFail("No WebView context found. Dropping test.");
       }
     }
   }

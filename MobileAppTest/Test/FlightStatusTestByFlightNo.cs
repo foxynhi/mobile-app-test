@@ -8,7 +8,7 @@
       ReportUtility.LogInfo($"Starting Get Flight Status By Flight Number test.");
       homePage.GoToHomePage();
       var flightStatusPage = homePage.GoToFlightStatusPage();
-      string rawStatus = flightStatusPage.GetFlightStatusByFlightNo("MH75");
+      string rawStatus = flightStatusPage.GetFlightStatusByFlightNo("MH750");
       string status = flightStatusPage.FormatFlightStatus(rawStatus);
 
       string[] lines = status.Split(new[] { "\n" }, StringSplitOptions.None);

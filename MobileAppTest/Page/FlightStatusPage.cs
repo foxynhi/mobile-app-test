@@ -11,9 +11,25 @@ namespace MobileAppTest.Page
     public FlightStatusPage(AndroidDriver driver) : base(driver) { }
     private By day(string d)
     {
-      return By.XPath("//android.view.View[@content-desc=" + d + "]");
+      int dayNumber;
+      if (!int.TryParse(d, out dayNumber))
+        throw new ArgumentException("Invalid day format: " + d);
+
+      int today = DateTime.Today.Day;
+
+      string xpath;
+      if (dayNumber < today)
+      {
+        xpath = $"(//android.view.View[@content-desc=\"{d}\"])[2]";
+      }
+      else
+      {
+        xpath = $"//android.view.View[@content-desc=\"{d}\"]";
+      }
+
+      return By.XPath(xpath);
     }
-    public string GetFlightStatusyCity(string depCity, string arrCity)
+    public string GetFlightStatusByCity(string depCity, string arrCity)
     {
       ReportUtility.LogInfo("Choosing date");
       By Date = By.XPath("//android.view.View[@content-desc=\"Departure date\"]");
@@ -81,7 +97,7 @@ namespace MobileAppTest.Page
       string flightStatusText = "";
       try
       {
-        flightStatus = WaitUtility.WaitForElementVisible(By.XPath("//android.widget.ScrollView/android.view.View[1]//android.widget.ImageView"));        
+        flightStatus = WaitUtility.WaitForElementVisible(By.XPath("//android.widget.ImageView[contains(@content-desc,'"+ flightNo + "')]"), 5);        
       }
       catch (WebDriverTimeoutException ex)
       {
@@ -96,7 +112,7 @@ namespace MobileAppTest.Page
       {
         try
         {
-          flightStatus = WaitUtility.WaitForElementVisible(By.XPath("//android.widget.ScrollView/android.view.View[1]"));
+          flightStatus = WaitUtility.WaitForElementVisible(By.XPath("//android.widget.ScrollView/android.view.View[1]"), 5);
         }
         catch (WebDriverTimeoutException ex)
         {
@@ -111,12 +127,13 @@ namespace MobileAppTest.Page
       {
         flightStatusText = flightStatus.GetAttribute("content-desc") ?? "";
       }
-
+      Console.WriteLine(flightStatusText);
       return flightStatusText;
     }
 
     public string FormatFlightStatus(string raw)
     {
+      Console.Write(raw);
       if (raw.Contains("no flights"))
         return raw;
 
