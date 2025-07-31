@@ -9,6 +9,7 @@ env:
   ANDROID_API_LEVEL: 30
   ANDROID_TARGET: google_apis
   ANDROID_ARCH: x86_64
+  AVD_NAME: test
 
 
 jobs:
@@ -61,8 +62,8 @@ jobs:
         
     - name: Start Emulator
       run: |
-        echo "no" | avdmanager create avd -n test -d "pixel_xl" -k "system-images;android-${{ env.ANDROID_API_LEVEL }};${{ env.ANDROID_TARGET }};${{ env.ANDROID_ARCH }}"
-        emulator -avd test -no-snapshot -no-audio -no-window -gpu swiftshader_indirect -camera-back none -camera-front none &
+        echo "no" | avdmanager create avd -n env.AVD_NAME -d "pixel_xl" -k "system-images;android-${{ env.ANDROID_API_LEVEL }};${{ env.ANDROID_TARGET }};${{ env.ANDROID_ARCH }}"
+        emulator -avd env.AVD_NAME -no-snapshot -no-audio -no-window -gpu swiftshader_indirect -camera-back none -camera-front none &
         adb wait-for-device
         adb shell getprop sys.boot_completed
         while [ "$(adb shell getprop sys.boot_completed | tr -d '\r')" != "1" ]; do sleep 5; done
