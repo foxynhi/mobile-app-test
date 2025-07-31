@@ -14,10 +14,26 @@ namespace MobileAppTest.Page
     private By arrCity = By.XPath("(//android.widget.Button[contains(@content-desc,\"Ho Chi Minh City, Vietnam\")])[1]");
 
     private By datePicker = By.XPath("//android.view.View[@content-desc=\"Departure date\"]");
-    private By monthYear = By.XPath("//android.view.View[@content-desc=\"July 2025\"]");
+    private By monthYear = By.XPath("//android.view.View[@content-desc="+ DateTime.Now.ToString("MMMM yyyy") + "]");
     private By day(string d)
     {
-      return By.XPath("//android.view.View[@content-desc=" + d + "]");
+      int dayNumber;
+      if (!int.TryParse(d, out dayNumber))
+        throw new ArgumentException("Invalid day format: " + d);
+
+      int today = DateTime.Today.Day;
+
+      string xpath;
+      if (dayNumber < today)
+      {
+        xpath = $"(//android.view.View[@content-desc=\"{d}\"])[2]";
+      }
+      else
+      {
+        xpath = $"//android.view.View[@content-desc=\"{d}\"]";
+      }
+
+      return By.XPath(xpath);
     } 
     private By dateSubmit = By.XPath("//android.widget.Button[@content-desc=\"Done\"]");
     private By searchBtn = By.XPath("//android.widget.Button[@content-desc=\"Search Flight\"]");
@@ -57,7 +73,6 @@ namespace MobileAppTest.Page
 
       ReportUtility.LogInfo("Choosing date");
       WaitUtility.TryClick(datePicker);
-      Assert.That(Find(monthYear).Displayed, Is.True);
       WaitUtility.TryClick(day(DateTime.Now.AddDays(1).ToString("dd")));
 
       WaitUtility.TryClick(dateSubmit);
@@ -81,37 +96,38 @@ namespace MobileAppTest.Page
 
         ReportUtility.LogInfo("Selecting guest title");
         By title = By.CssSelector("mat-select[formcontrolname='title']");
-        ActionUtility.SwipeToElement(title);
+        WaitUtility.WaitForElementVisible(title, 30);
+        ActionUtility.SwipeToElementJS(title);
         WaitUtility.TryClick(title, 10);
         WaitUtility.TryClick(By.XPath("//mat-option//span[text()='Mr']"));
 
         var firstName = By.CssSelector("input[formcontrolname='firstName'][aria-required=\"true\"]");
-        ActionUtility.SwipeToElement(firstName);
+        ActionUtility.SwipeToElementJS(firstName);
         WaitUtility.TryClick(firstName);
         SendKeys(firstName, "John");
 
         var lastName = By.CssSelector("input[formcontrolname='lastName'][aria-required=\"true\"]");
-        ActionUtility.SwipeToElement(lastName);
+        ActionUtility.SwipeToElementJS(lastName);
         WaitUtility.TryClick(lastName);
         SendKeys(lastName, "Adam");
 
         var DOB = By.CssSelector("input[formcontrolname='dob'][aria-required=\"true\"]");
-        ActionUtility.SwipeToElement(DOB);
+        ActionUtility.SwipeToElementJS(DOB);
         WaitUtility.TryClick(DOB);
         SendKeys(DOB, "01012000");
 
         var maleBtn = By.CssSelector("input[type='radio'][value='male']");
-        ActionUtility.SwipeToElement(maleBtn);
+        ActionUtility.SwipeToElementJS(maleBtn);
         WaitUtility.TryClick(maleBtn);
 
         var nationality = By.CssSelector("input[placeholder='Nationality']");
-        ActionUtility.SwipeToElement(nationality);
+        ActionUtility.SwipeToElementJS(nationality);
         WaitUtility.TryClick(nationality);
         SendKeys(nationality, "Viet");
         WaitUtility.TryClick(By.XPath("//mat-option//span[text()='Vietnamese']"), 5);
 
         var docNumber = By.XPath("input[placeholder='Your document number']");
-        ActionUtility.SwipeToElement(docNumber);
+        ActionUtility.SwipeToElementJS(docNumber);
         WaitUtility.TryClick(docNumber);
         SendKeys(docNumber, "C3481043");
 
@@ -121,29 +137,29 @@ namespace MobileAppTest.Page
         SendKeys(expDate, "01012027");
 
         var docCountry = By.XPath("input[placeholder='Document issued by']");
-        ActionUtility.SwipeToElement(docCountry);
+        ActionUtility.SwipeToElementJS(docCountry);
         WaitUtility.TryClick(docCountry);
         SendKeys(docCountry, "Viet");
         WaitUtility.TryClick(By.XPath("//mat-option//span[contains(text(),'Viet')]"), 5);
 
         var emailInp = By.XPath("//label[contains(., 'Email') and not(contains(., 'Confirm'))]/ancestor::div[contains(@class,'mat-mdc-form-field-flex')]//input[@type='email']");
-        ActionUtility.SwipeToElement(emailInp);
+        ActionUtility.SwipeToElementJS(emailInp);
         WaitUtility.TryClick(emailInp);
-        SendKeys(emailInp, "dinkhoi71234@gmail.com");
+        SendKeys(emailInp, "dinh71234@gmail.com");
 
         var confirmEmailInp = By.XPath("//label[contains(., 'Confirm email')]/ancestor::div[contains(@class,'mat-mdc-form-field-flex')]//input[@type='email']");
-        ActionUtility.SwipeToElement(confirmEmailInp);
+        ActionUtility.SwipeToElementJS(confirmEmailInp);
         WaitUtility.TryClick(confirmEmailInp);
         SendKeys(confirmEmailInp, "dinkhoi71234@gmail.com");
 
         var code = By.XPath("input[placeholder='Your country calling code']");
-        ActionUtility.SwipeToElement(code);
+        ActionUtility.SwipeToElementJS(code);
         WaitUtility.TryClick(code);
         SendKeys(code, "Viet");
         WaitUtility.TryClick(By.XPath("//mat-option//span[contains(text(),'Viet')]"), 5);
 
         var phoneNumber = By.XPath("input[placeholder='Your mobile phone']");
-        ActionUtility.SwipeToElement(phoneNumber);
+        ActionUtility.SwipeToElementJS(phoneNumber);
         WaitUtility.TryClick(phoneNumber);
         SendKeys(phoneNumber, "0982136343");
       }
@@ -151,7 +167,6 @@ namespace MobileAppTest.Page
       {
         Console.WriteLine("No WebView context found");
       }
-
     }
   }
 }

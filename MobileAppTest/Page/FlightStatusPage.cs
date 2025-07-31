@@ -13,7 +13,7 @@ namespace MobileAppTest.Page
     {
       return By.XPath("//android.view.View[@content-desc=" + d + "]");
     }
-    public string GetFlightStatus(string depCity, string arrCity)
+    public string GetFlightStatusyCity(string depCity, string arrCity)
     {
       ReportUtility.LogInfo("Choosing date");
       By Date = By.XPath("//android.view.View[@content-desc=\"Departure date\"]");
@@ -58,8 +58,68 @@ namespace MobileAppTest.Page
       var flightStatusText = flightStatus.GetAttribute("content-desc");
       return flightStatusText;
     }
+
+    public string GetFlightStatusByFlightNo(string flightNo)
+    {
+      WaitUtility.TryClick(By.XPath("//android.view.View[contains(@content-desc,\"Flight Number\")]"));
+
+      ReportUtility.LogInfo("Choosing date");
+      By Date = By.XPath("//android.view.View[@content-desc=\"Departure date\"]");
+      WaitUtility.TryClick(Date);
+      WaitUtility.TryClick(day(DateTime.Now.AddDays(1).ToString("dd")));
+      WaitUtility.TryClick(By.XPath("//android.widget.Button[@content-desc=\"Done\"]"));
+
+      ReportUtility.LogInfo("Entering flight number");
+      By textInp = By.XPath("//android.widget.EditText");
+      WaitUtility.TryClick(textInp);
+      SendKeys(textInp, flightNo);
+
+
+      WaitUtility.TryClick(By.XPath("//android.widget.Button[@content-desc=\"View Flight Status\"]"));
+      ReportUtility.LogInfo("Loading flight status");
+      IWebElement flightStatus = null;
+      string flightStatusText = "";
+      try
+      {
+        flightStatus = WaitUtility.WaitForElementVisible(By.XPath("//android.widget.ScrollView/android.view.View[1]//android.widget.ImageView"));        
+      }
+      catch (WebDriverTimeoutException ex)
+      {
+        Console.WriteLine(ex.Message);
+      }
+      catch (NoSuchElementException ex)
+      {
+        Console.WriteLine(ex.Message);
+      }
+
+      if (flightStatus == null)
+      {
+        try
+        {
+          flightStatus = WaitUtility.WaitForElementVisible(By.XPath("//android.widget.ScrollView/android.view.View[1]"));
+        }
+        catch (WebDriverTimeoutException ex)
+        {
+          Console.WriteLine(ex.Message);
+        }
+        catch (NoSuchElementException ex)
+        {
+          Console.WriteLine(ex.Message);
+        }
+      }
+      if (flightStatus != null)
+      {
+        flightStatusText = flightStatus.GetAttribute("content-desc") ?? "";
+      }
+
+      return flightStatusText;
+    }
+
     public string FormatFlightStatus(string raw)
     {
+      if (raw.Contains("no flights"))
+        return raw;
+
       string[] lines = raw.Split(new[] { "\n" }, StringSplitOptions.None);
 
       string GetValue(string[] arr, int index) =>

@@ -1,17 +1,14 @@
-﻿using MobileAppTest.Page;
-using Newtonsoft.Json.Linq;
-
-namespace MobileAppTest.Test
+﻿namespace MobileAppTest.Test
 {
-  public class FlightStatusTest : BaseTest
+  public class FlightStatusTestByFlightNo : BaseTest
   {
     [Test]
-    public void GetFlightStatusTest()
+    public void GetFlightStatusByFlightNoTest()
     {
-      ReportUtility.LogInfo($"Starting GetFlightStatus test.");
+      ReportUtility.LogInfo($"Starting Get Flight Status By Flight Number test.");
       homePage.GoToHomePage();
       var flightStatusPage = homePage.GoToFlightStatusPage();
-      string rawStatus = flightStatusPage.GetFlightStatus("Kuala Lumpur", "Ho Chi Minh City");
+      string rawStatus = flightStatusPage.GetFlightStatusByFlightNo("MH75");
       string status = flightStatusPage.FormatFlightStatus(rawStatus);
 
       string[] lines = status.Split(new[] { "\n" }, StringSplitOptions.None);
