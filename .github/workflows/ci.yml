@@ -1,0 +1,127 @@
+name: Mobile App Test
+
+on:
+  push:
+    branches: [ master ]
+   
+env:
+  DOTNET_VERSION: '8.0.x'
+  ANDROID_API_LEVEL: 30
+  ANDROID_TARGET: google_apis
+  ANDROID_ARCH: x86_64
+
+
+jobs:
+  android-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{env.DOTNET_VERSION}}
+        
+    - name: Setup Node.js for Appium
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Cache .NET packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+
+    # - name: Install NuGet CLI
+    #   uses: NuGet/setup-nuget@v2
+
+    # - name: Restore NuGet packages
+    #   run: nuget restore MobileAppTest.sln
+
+    - name: Restore dependencies
+      run: dotnet restore MobileAppTest.sln
+
+    - name: Build the solution
+      run: dotnet build MobileAppTest.sln --configuration Release --no-restore
+
+    - name: Set up Android SDK
+      uses: android-actions/setup-android@v3
+
+
+    - name: Setup Android SDK tools
+      run: |
+        echo "y" | sdkmanager --licenses
+        sdkmanager "platform-tools" "platforms;android-${{ env.ANDROID_API_LEVEL }}"
+        sdkmanager "system-images;android-${{ env.ANDROID_API_LEVEL }};${{ env.ANDROID_TARGET }};${{ env.ANDROID_ARCH }}"
+        
+    - name: Start Emulator
+      run: |
+        echo "no" | avdmanager create avd -n test -d "pixel_xl" -k "system-images;android-${{ env.ANDROID_API_LEVEL }};${{ env.ANDROID_TARGET }};${{ env.ANDROID_ARCH }}"
+        emulator -avd test -no-snapshot -no-audio -no-window -gpu swiftshader_indirect -camera-back none -camera-front none &
+        adb wait-for-device
+        adb shell getprop sys.boot_completed
+        while [ "$(adb shell getprop sys.boot_completed | tr -d '\r')" != "1" ]; do sleep 5; done
+        adb shell input keyevent 82
+        adb devices
+        echo "Emulator is ready"
+
+    - name: Install Appium
+      run: |
+        npm install -g appium
+        appium -v
+        appium driver install uiautomator2
+        appium driver list --installed
+
+    - name: Start Appium Server
+      run: |
+        appium server \
+          --address 127.0.0.1 \
+          --port 4723 \
+          --relaxed-security \
+          --log-timestamp \
+          --log-no-colors &
+        
+        timeout 30 bash -c 'until curl -s http://127.0.0.1:4723/status; do sleep 2; done'
+        echo "Appium server started successfully"
+
+    - name: Run Tests
+      run: |
+        dotnet test MobileAppTest.sln --no-restore \
+        --configuration Release \
+        --no-build --logger "trx" \
+        --logger "console;verbosity=detailed \
+        --results-directory ./TestResults
+      env:
+        APPIUM_SERVER_URL: http://127.0.0.1:4723
+        ANDROID_DEVICE_NAME: test_emulator
+        PLATFORM_VERSION: ${{ env.ANDROID_API_LEVEL }}
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results
+        path: |  
+          ./TestResults/*
+          # ./TestResults/**/*.trx
+          # ./TestResults/*.html
+          # ./TestResults/**/coverage.cobertura.xml
+    
+    - name: Publish test results
+      uses: dorny/test-reporter@v1
+      if: always()
+      with:
+        name: Mobile Test Results
+        path: './TestResults/**/*.trx'
+        reporter: dotnet-trx
+        
+    - name: Stop Appium and emulator
+      if: always()
+      run: |
+        pkill -f appium || true
+        adb emu kill || true
